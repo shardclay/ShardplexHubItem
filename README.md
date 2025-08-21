@@ -9,3 +9,5 @@ Create Custom Items: Define custom names, lore, and materials for your items.
 Locked Interaction: Players cannot place, break blocks, or otherwise use the item as a regular tool or block. This prevents abuse and preserves the item's purpose.
 
 Command Execution: Execute any server command or a sequence of commands when the player right-clicks or left-clicks with the item.
+
+_ tested on 1.21.8
