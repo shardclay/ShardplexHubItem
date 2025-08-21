@@ -1,0 +1,25 @@
+# ID предмета. Список: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+item-id: COMPASS
+
+# Название предмета. Поддерживает обычные (&) и HEX (<#RRGGBB>) цветовые коды.
+item-name: "<#8a7d93>Выбрать сервер"
+
+# Описание предмета. Поддерживает обычные (&) и HEX (<#RRGGBB>) цветовые коды.
+item-lore:
+  - "&7Нажми, чтобы открыть меню."
+
+# Звук, который воспроизводится при клике. Список: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+sound: "BLOCK_NOTE_BLOCK_PLING"
+
+# --- РЕЖИМЫ ВЫПОЛНЕНИЯ КОМАНД ---
+# Вы можете включить один из режимов или оба сразу.
+
+# Выполнять команду от имени консоли?
+console_mode: false
+# Команда для выполнения из консоли. Поддерживает PlaceholderAPI.
+console_command: "say команда из консоли для %player_name%"
+
+# Выполнять команду от имени игрока?
+player_mode: true
+# Команда для выполнения от имени игрока. Поддерживает PlaceholderAPI.
+player_command: "dm open servers %player_name%"

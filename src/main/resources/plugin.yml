@@ -1,0 +1,18 @@
+name: ShardplexHubItem
+version: 1.1
+main: com.shardclay.shardplexhubitem.ShardplexHubItem
+api-version: 1.20
+author: Shardclay
+softdepend: [PlaceholderAPI]
+commands:
+  shi:
+    description: Main command for ShardplexHubItem
+    usage: /<command> [reload|give]
+    aliases: [sh]
+permissions:
+  shardplex.shi.reload:
+    description: Allows reloading the plugin's configuration.
+    default: op
+  shardplex.shi.give:
+    description: Allows giving the custom item to a player.
+    default: op
