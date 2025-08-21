@@ -1,5 +1,4 @@
 # ShardplexHubItem
-Custom Items with Locked Interaction &amp; Command Execution
 
 A lightweight Minecraft plugin designed for server administrators to create custom items. These items have a "hard fixation" — meaning all default interactions (placing, breaking, using) are blocked. Their sole purpose is to run a configured command when a player clicks with them.
 
