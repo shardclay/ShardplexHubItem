@@ -28,14 +28,12 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
 
     private ItemStack customItem;
     private Sound interactionSound;
-    private final int ITEM_SLOT = 4; // Slot 5 in inventory is index 4
+    private int itemSlot;
     private final Pattern hexPattern = Pattern.compile("<#([A-Fa-f0-9]{6})>");
 
     // Configuration fields
-    private boolean consoleMode;
-    private String consoleCommand;
-    private boolean playerMode;
-    private String playerCommand;
+    private boolean commandEnabled;
+    private String command;
 
     @Override
     public void onEnable() {
@@ -65,17 +63,20 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
     private void loadConfig() {
         reloadConfig();
 
-        String itemId = getConfig().getString("item-id", "COMPASS");
+        // Load item configuration
+        String itemId = getConfig().getString("item-id", "RECOVERY_COMPASS");
         Material material = Material.matchMaterial(itemId);
         if (material == null) {
-            material = Material.COMPASS;
-            getLogger().warning("Неверный ID предмета config.yml. Вернул к ID по умолчанию COMPASS.");
+            material = Material.RECOVERY_COMPASS;
+            getLogger().warning("Invalid item ID in config.yml. Defaulting to RECOVERY_COMPASS.");
         }
+
+        itemSlot = getConfig().getInt("item-slot", 4);
 
         customItem = new ItemStack(material, 1);
         ItemMeta meta = customItem.getItemMeta();
         if (meta != null) {
-            String name = getConfig().getString("item-name", "<#8a7d93>Выбрать сервер");
+            String name = getConfig().getString("item-name", "<#8a7d93>Server Selector");
             meta.setDisplayName(translateHexColorCodes(name));
 
             List<String> lore = getConfig().getStringList("item-lore");
@@ -83,25 +84,30 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
                     .map(this::translateHexColorCodes)
                     .collect(Collectors.toList());
             meta.setLore(coloredLore);
+
+            int customModelData = getConfig().getInt("custom-model-data", 0);
+            if (customModelData > 0) {
+                meta.setCustomModelData(customModelData);
+            }
+
             customItem.setItemMeta(meta);
         }
 
+        // Load sound configuration
         try {
-            interactionSound = Sound.valueOf(getConfig().getString("sound", "BLOCK_NOTE_BLOCK_PLING"));
+            interactionSound = Sound.valueOf(getConfig().getString("sound", "BLOCK_AMETHYST_BLOCK_PLACE"));
         } catch (IllegalArgumentException e) {
-            getLogger().warning("Неверный звук в config.yml. В верунл к звуку по умолчанию BLOCK_NOTE_BLOCK_PLING.");
-            interactionSound = Sound.BLOCK_NOTE_BLOCK_PLING;
+            getLogger().warning("Invalid sound in config.yml. Defaulting to BLOCK_AMETHYST_BLOCK_PLACE.");
+            interactionSound = Sound.BLOCK_AMETHYST_BLOCK_PLACE;
         }
 
-        // Load new execution modes
-        consoleMode = getConfig().getBoolean("console_mode", false);
-        consoleCommand = getConfig().getString("console_command", "");
-        playerMode = getConfig().getBoolean("player_mode", false);
-        playerCommand = getConfig().getString("player_command", "");
+        // Load command configuration
+        commandEnabled = getConfig().getBoolean("command_enabled", true);
+        command = getConfig().getString("command", "say Test");
     }
 
     private void givePlayerCustomItem(Player player) {
-        player.getInventory().setItem(ITEM_SLOT, customItem);
+        player.getInventory().setItem(itemSlot, customItem);
     }
 
     private void updateAllPlayersItems() {
@@ -114,13 +120,13 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("shi")) {
             if (args.length == 0) {
-                sender.sendMessage(ChatColor.RED + "Использование: /shi [reload|give]");
+                sender.sendMessage(ChatColor.RED + "Usage: /shi [reload|give]");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("shardplex.shi.reload")) {
-                    sender.sendMessage(ChatColor.RED + "У вас нет прав на использование данной команды.");
+                    sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                     return true;
                 }
                 loadConfig();
@@ -131,20 +137,20 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
 
             if (args[0].equalsIgnoreCase("give")) {
                 if (!sender.hasPermission("shardplex.shi.give")) {
-                    sender.sendMessage(ChatColor.RED + "У вас нет прав на использование данной команды.");
+                    sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                     return true;
                 }
                 if (args.length < 2) {
-                    sender.sendMessage(ChatColor.RED + "Использование: /shi give <player>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /shi give <player>");
                     return true;
                 }
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    sender.sendMessage(ChatColor.RED + "Игрок не найден.");
+                    sender.sendMessage(ChatColor.RED + "Player not found.");
                     return true;
                 }
                 givePlayerCustomItem(target);
-                sender.sendMessage(ChatColor.GREEN + "Предмет выдан игроку " + target.getName());
+                sender.sendMessage(ChatColor.GREEN + "Item given to " + target.getName());
                 return true;
             }
         }
@@ -152,31 +158,15 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
     }
 
     private void performActions(Player player) {
-        boolean commandWasRun = false;
-
-        if (consoleMode && consoleCommand != null && !consoleCommand.isEmpty()) {
-            String commandToExecute = consoleCommand;
+        if (commandEnabled && command != null && !command.isEmpty()) {
+            String commandToExecute = command;
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 commandToExecute = PlaceholderAPI.setPlaceholders(player, commandToExecute);
             }
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandToExecute);
-            commandWasRun = true;
-        }
+            
+            // Execute command as player
+            Bukkit.dispatchCommand(player, commandToExecute);
 
-        if (playerMode && playerCommand != null && !playerCommand.isEmpty()) {
-            String commandToExecute = playerCommand;
-            if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                commandToExecute = PlaceholderAPI.setPlaceholders(player, commandToExecute);
-            }
-            // Ensure the command starts with a / for chat
-            if (!commandToExecute.startsWith("/")) {
-                commandToExecute = "/" + commandToExecute;
-            }
-            player.chat(commandToExecute);
-            commandWasRun = true;
-        }
-
-        if (commandWasRun) {
             player.playSound(player.getLocation(), interactionSound, 1.0f, 1.0f);
         }
     }
@@ -190,7 +180,7 @@ public class ShardplexHubItem extends JavaPlugin implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         ItemStack currentItem = event.getCurrentItem();
         if (currentItem != null && currentItem.isSimilar(customItem)) {
-             if (event.getSlot() == ITEM_SLOT || event.isShiftClick()) {
+             if (event.getSlot() == itemSlot || event.isShiftClick()) {
                 event.setCancelled(true);
                 performActions((Player) event.getWhoClicked());
             }

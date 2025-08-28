@@ -1,25 +1,27 @@
-# ID предмета. Список: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
-item-id: COMPASS
+# The ID of the item. List: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+item-id: RECOVERY_COMPASS
 
-# Название предмета. Поддерживает обычные (&) и HEX (<#RRGGBB>) цветовые коды.
-item-name: "<#8a7d93>Выбрать сервер"
+# The slot number where the item will be placed in the player's inventory.
+# 0 is the first slot, 8 is the last hotbar slot.
+item-slot: 4
 
-# Описание предмета. Поддерживает обычные (&) и HEX (<#RRGGBB>) цветовые коды.
+# The name of the item. Supports standard (&) and HEX (<#RRGGBB>) color codes.
+item-name: "<#8a7d93>Server Selector"
+
+# The lore of the item. Supports standard (&) and HEX (<#RRGGBB>) color codes.
 item-lore:
-  - "&7Нажми, чтобы открыть меню."
+  - "&7Click to open the menu."
 
-# Звук, который воспроизводится при клике. Список: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
-sound: "BLOCK_NOTE_BLOCK_PLING"
+# CustomModelData for the item. Requires a resource pack on the client.
+# Set to 0 to disable.
+custom-model-data: 0
 
-# --- РЕЖИМЫ ВЫПОЛНЕНИЯ КОМАНД ---
-# Вы можете включить один из режимов или оба сразу.
+# The sound that plays on click. List: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+sound: "BLOCK_AMETHYST_BLOCK_PLACE"
 
-# Выполнять команду от имени консоли?
-console_mode: false
-# Команда для выполнения из консоли. Поддерживает PlaceholderAPI.
-console_command: "say команда из консоли для %player_name%"
-
-# Выполнять команду от имени игрока?
-player_mode: true
-# Команда для выполнения от имени игрока. Поддерживает PlaceholderAPI.
-player_command: "dm open servers %player_name%"
+# --- COMMAND TO EXECUTE ---
+# Should a command be executed when the player interacts with the item?
+command_enabled: true
+# The command to be executed by the player. Supports PlaceholderAPI.
+# The leading "/" is not needed.
+command: "say Test"
